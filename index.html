@@ -15,8 +15,26 @@
 
 <div class="container-fluid mt-3" id="app">
     <input type="text" class="form-control" v-model="criterioDeBusqueda"
-        placeholder="Ingresar un criterio de busqueda...">
+        placeholder="Ingresar al menos 3 letras para filtrar por nombre, apellido o correo...">
     <br>
+
+    <div v-if="this.criterioDeBusqueda.length<3 && this.criterioDeBusqueda.length !=0"class="alert alert-danger" role="alert">
+        Debe ingresar al menos tres caracteres.
+    </div>
+
+    <!--Se agrega mensaje de advertencia para que no se ingresen números en este campo-->>
+    <div v-if="this.criterioDeBusqueda.match(/[0-9]/g, '')"class="alert alert-warning" role="alert">
+        Los números ingresados en este campo no se considerarán para el filtrado.
+    </div>
+
+    <input type="number" class="form-control" v-model="criterioDeBusqueda2"
+    placeholder="Ingresar al menos tres números de DNI para filtrar...">
+    <br>
+
+    <div v-if="this.criterioDeBusqueda2.length<3 && this.criterioDeBusqueda2.length !=0"class="alert alert-danger" role="alert">
+        Debe ingresar al menos tres números.
+    </div>
+
     <div class="card-deck m-0">
         <div class="row">
             <div class="col" v-for="persona in personasFiltradas">
@@ -40,6 +58,7 @@
         el: '#app',
         data: {
             criterioDeBusqueda: '',
+            criterioDeBusqueda2: '',
             //Aquí, en este array es donde tienen que agregar su información
             personas: [
                 {
@@ -49,26 +68,54 @@
                     dni: "20442873"
                 },
                 {
-                    nombre: "...",
-                    apellido: "...",
-                    correo: "...",
-                    dni: "..."
+                    nombre: "Luciano",
+                    apellido: "Zocco",
+                    correo: "lzxxxxx@hotmail.com",
+                    dni: "37777777"
+                },
+                {
+                    nombre: "Roberto",
+                    apellido: "Perez",
+                    correo: "rpxxxxx@hotmail.com",
+                    dni: "38888888"
+                },
+                {
+                    nombre: "Florencia",
+                    apellido: "Lopez",
+                    correo: "flxxxxx@hotmail.com",
+                    dni: "39999999"
                 },
             ]
 
         },
         computed: {
             personasFiltradas() {
+
+                // Con esta expresión regular procuro que el primer filtro SOLO filtre por caracteres
+                // no numéricos, no teniendo en cuenta si el usuario ingresa números
+                let criterioNuevo = this.criterioDeBusqueda.replace(/[0-9]/g, '')
+
                 return this.personas.filter((persona) => {
                     let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`
-                    return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase())
+                    return registroCompleto.toLowerCase().includes(criterioNuevo.toLowerCase())
+                }).filter((persona)=>{
+                    let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`
+                    return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda2.toLowerCase())
                 });
-            }
+
+             /*    return this.personas.filter((persona) => {
+                    let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`
+                    return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase())
+                }); */
+            },
+
         },
+
         methods: {
             getNombreCompleto(persona) {
                 return `${persona.nombre} ${persona.apellido}`
-            }
+            },
+
         }
     });
 </script>
